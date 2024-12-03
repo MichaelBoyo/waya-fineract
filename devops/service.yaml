@@ -52,8 +52,6 @@ spec:
             initialDelaySeconds: 180
             periodSeconds: 1
           envFrom:
-            - configMapRef:
-                name: mifosapp-service-config         
             - secretRef:
                 name: mifosapp-service-creds
           ports:
