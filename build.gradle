@@ -803,9 +803,3 @@ task printSourceSetInformation() {
     }
 }
 
-jib {
-    to {
-        image = "${REGISTRY}/${SERVICE_NAME}:${VERSION}"
-    }
-}
-
