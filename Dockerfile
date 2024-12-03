@@ -3,7 +3,9 @@ FROM openjdk:17-jdk-alpine as corebanking
 
 WORKDIR /app
 
-COPY fineract-provider/build/libs/*.jar app.jar
+COPY fineract-provider/build/libs/fineract-app-1.0.0.jar app.jar
+
+#COPY fineract-provider/build/libs/*.jar app.jar
 
 WORKDIR /app/fineract-pentaho
 RUN wget -q https://s3.eu-west-3.amazonaws.com/waya-2.0-file-resources/others/fineract-pentaho-0.0.1-SNAPSHOT.tar
