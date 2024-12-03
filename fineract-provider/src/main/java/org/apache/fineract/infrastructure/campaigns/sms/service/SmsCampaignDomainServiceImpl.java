@@ -276,7 +276,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                         }
                         SmsMessage smsMessage = SmsMessage.pendingSms(null, null, client, null, message, mobileNumber, smsCampaign,
                                 smsCampaign.isNotification());
-                        this.smsMessageRepository.save(smsMessage);
+                        smsMessage = this.smsMessageRepository.saveAndFlush(smsMessage);
                         Collection<SmsMessage> messages = new ArrayList<>();
                         messages.add(smsMessage);
                         Map<SmsCampaign, Collection<SmsMessage>> smsDataMap = new HashMap<>();
