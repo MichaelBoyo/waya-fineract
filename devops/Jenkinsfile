@@ -33,6 +33,7 @@ pipeline {
                     // Use Jib to build Docker image instead of docker.build
                     echo 'Building Docker image with Jib'
                     sh './gradlew :fineract-provider:jibDockerBuild -x test'
+                    sh "docker tag ${SERVICE_NAME}:${VERSION} ${REGISTRY}/${SERVICE_NAME}:${VERSION}"
                     //dockerImage = docker.build "${REGISTRY}/${SERVICE_NAME}:${VERSION}"
                 }
             }   
