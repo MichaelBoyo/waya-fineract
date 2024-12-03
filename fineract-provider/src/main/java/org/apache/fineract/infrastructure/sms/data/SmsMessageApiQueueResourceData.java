@@ -39,6 +39,7 @@ public class SmsMessageApiQueueResourceData {
     private String mobileNumber;
     private String message;
     private Long providerId;
+    private String type;
 
     /**
      * @return a new instance of the SmsMessageApiQueueResourceData class
@@ -48,7 +49,8 @@ public class SmsMessageApiQueueResourceData {
 
         return new SmsMessageApiQueueResourceData().setInternalId(internalId).setTenantId(mifosTenantIdentifier)
                 .setCreatedOnDate(createdOnDate).setSourceAddress(sourceAddress).setMobileNumber(mobileNumber).setMessage(message)
-                .setProviderId(providerId);
+                .setProviderId(providerId)
+                .setType("sms");
     }
 
     /**

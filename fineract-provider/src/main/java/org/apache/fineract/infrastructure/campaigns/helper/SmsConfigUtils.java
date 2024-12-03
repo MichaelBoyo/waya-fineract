@@ -22,6 +22,8 @@ import jakarta.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.campaigns.sms.constants.SmsCampaignConstants;
 import org.apache.fineract.infrastructure.campaigns.sms.data.MessageGatewayConfigurationData;
 import org.apache.fineract.infrastructure.configuration.service.ExternalServicesPropertiesReadPlatformService;
@@ -33,6 +35,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class SmsConfigUtils {
 
@@ -48,6 +51,9 @@ public class SmsConfigUtils {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add(SmsCampaignConstants.FINERACT_PLATFORM_TENANT_ID, tenant.getTenantIdentifier());
+        headers.add(SmsCampaignConstants.X_ORCHESTRATOR, tenant.getTenantIdentifier());
+        log.info("tenant.getTenantIdentifier() {}",tenant.getTenantIdentifier());
+        log.info("messageGatewayConfigurationData.getTenantAppKey() {}",messageGatewayConfigurationData.getTenantAppKey());
         headers.add(SmsCampaignConstants.FINERACT_TENANT_APP_KEY, messageGatewayConfigurationData.getTenantAppKey());
         StringBuilder pathBuilder = new StringBuilder();
         String endPoint = messageGatewayConfigurationData.getEndPoint() == null || messageGatewayConfigurationData.getEndPoint().equals("/")
@@ -57,12 +63,23 @@ public class SmsConfigUtils {
                 ? pathBuilder.append("{apiEndPoint}")
                 : pathBuilder.append("{endPoint}/{apiEndPoint}");
         // pathBuilder.append("{endPoint}/{apiEndPoint}") ;
-        UriBuilder builder = UriBuilder.fromPath(pathBuilder.toString()).host(messageGatewayConfigurationData.getHostName()).scheme("http")
+        String uriString = String.format(
+                "%s:%d/%s/%s",
+                messageGatewayConfigurationData.getHostName(),
+                messageGatewayConfigurationData.getPortNumber(),
+                 endPoint,
+                apiEndPoint
+        ).replaceAll("//+", "/"); // Normalize to avoid double slashes
+        UriBuilder builder = UriBuilder.fromPath(pathBuilder.toString()).host(messageGatewayConfigurationData.getHostName())
+                .scheme("https")
                 .port(messageGatewayConfigurationData.getPortNumber());
-        URI uri = messageGatewayConfigurationData.getEndPoint() == null || messageGatewayConfigurationData.getEndPoint().equals("/")
-                ? builder.build(apiEndPoint)
-                : builder.build(endPoint, apiEndPoint);
+        // Ensure scheme is correctly prefixed
+        if (!uriString.startsWith("https://")) {
+            uriString = "https://" + uriString;
+        }
+        URI uri = URI.create(uriString);
         HttpEntity<?> entity = null;
+       log.info("uri {}",uri.toString());
         if (apiQueueResourceDatas != null) {
             entity = new HttpEntity<>(apiQueueResourceDatas, headers);
         } else {
