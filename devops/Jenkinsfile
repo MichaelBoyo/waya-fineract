@@ -20,6 +20,7 @@ pipeline {
         stage("build") {
             steps{
                 script {
+                    // Build the project using Gradle and skip tests
                     sh './gradlew clean bootJar'
                     echo 'Build with Gradle'
                 }
@@ -29,7 +30,10 @@ pipeline {
         stage("Image Build") {
             steps{
                 script {
-                    dockerImage = docker.build "${REGISTRY}/${SERVICE_NAME}:${VERSION}"
+                    // Use Jib to build Docker image instead of docker.build
+                    echo 'Building Docker image with Jib'
+                    sh './gradlew :fineract-provider:jibDockerBuild -x test'
+                    //dockerImage = docker.build "${REGISTRY}/${SERVICE_NAME}:${VERSION}"
                 }
             }   
         }
@@ -41,9 +45,11 @@ pipeline {
             }   
         }
 
-        stage("pushing to ECR") {
+        stage("Pushing to AWS ECR") {
             steps{
                 script {
+                    // Push the image built with Jib to AWS ECR
+                    echo 'Pushing Docker image to ECR'
                     sh "docker push ${REGISTRY}/${SERVICE_NAME}:${VERSION}"
                 }
             }   
@@ -68,11 +74,11 @@ pipeline {
                     // Cleanup Docker image after deployment to free up space
                     echo "Cleaning up Docker images..."
 
-                    // Remove the Docker image from the Jenkins worker
+                    // Remove the Docker image from the Jenkins worker1
                     sh 'docker image prune -f'
                     sh "docker rmi ${REGISTRY}/${SERVICE_NAME}:${VERSION} || true"
                     
-                    // Optionally prune unused Docker objects like containers and volumes
+                    // Prune unused Docker objects containers and volumes
                     sh "docker system prune -f --volumes || true"
                 }
             }
