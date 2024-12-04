@@ -63,6 +63,8 @@ services:
     depends_on:
       - loki
     logging: *default-logging
+    volumes:
+      - mariadb_data:/var/lib/mysql
 
   fineract:
     container_name: fineract-development
@@ -88,3 +90,8 @@ services:
       # - ./config/docker/env/cloudwatch.env
       - ./config/docker/env/debug.env
     logging: *default-logging
+
+
+volumes:
+  mariadb_data:
+
