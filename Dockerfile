@@ -11,4 +11,4 @@ COPY . .
 RUN chmod +x ./gradlew
 
 # Run the specified Gradle command
-CMD ["./gradlew", ":fineract-provider:jibDockerBuild", "-x", "test"]
+RUN ./gradlew :fineract-provider:jibDockerBuild -x  test

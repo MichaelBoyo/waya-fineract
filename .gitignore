@@ -30,4 +30,4 @@ fineract-provider/src/main/generated/
 
 **/out/
 gradleExp/
-config/docker/env/fineract-common.env
+
